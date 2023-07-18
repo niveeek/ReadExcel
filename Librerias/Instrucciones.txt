@@ -1,0 +1,42 @@
+************************************************
+* Código desarrollado por el Ing. Marko Robles *
+*           Códigos de Programación            *
+************************************************
+
+Visítanos en:
+
+ • Sitio Web: http://codigosdeprogramacion.com
+ • Academia: http://codigosdeprogramacion.com/cursos
+ • YouTube: https://www.youtube.com/c/CodigosdeProgramacion
+ • Facebook: https://www.facebook.com/codigosprogramacion/
+ • Twitter: https://twitter.com/CodigosPrograma
+
+------------------------------------------------------
+
+
+Instrucciones para Implementar el Proyecto de Crear, Leer y Modifcar archivos de Excel en Java con Conexión a Base de Datos en MySQL del Capìtulo 10 del Curso de Java y MySQL
+
+1. Descargar Librería POI desde https://poi.apache.org/download.html
+
+2. Importar el proyecto que es la carpeta "Excel" a Netbeans.
+
+3. Agregar a las bibliotecas del proyecto las siguientes librerías:
+
+ • poi-version.jar
+ • commons-collections-version.jar
+ • poi-ooxml-version.jar
+ • poi-ooxml-schemas-version.jar
+ • xmlbeans-version.jar
+ • mysql-connector-java-version.jar
+
+4. Cargar la Base de Datos a MySQL. (tienda.sql).
+
+5. Editar las constantes de conexión en la Clase Conexion.java por nuestras credenciales de MySQL
+
+public static final String URL = "jdbc:mysql://localhost:3306/tienda"; //Dirección, puerto y nombre de la Base de Datos
+public static final String USERNAME = "root"; //Usuario de Acceso a MySQL
+public static final String PASSWORD = ""; //Password del usuario
+
+6. Ejecutar la Aplicación
+
+7. Agradecer.
