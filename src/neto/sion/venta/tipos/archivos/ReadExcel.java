@@ -19,7 +19,7 @@ public class ReadExcel {
             SION.obtenerParametro(Modulo.VENTA,"NUMERO.FILAS.BLOQUE.EXCEL"));
     private static Row firstRow;
 
-    public static void FileXLS(String pathExcel) {
+    public ReadExcel(String pathExcel) {
         pathExcel = pathExcel.trim();
         try {
             HSSFWorkbook hssfWorkbook = new HSSFWorkbook(new FileInputStream(pathExcel));
@@ -41,7 +41,7 @@ public class ReadExcel {
         }
     }
 
-    private static ArrayList<String> getValuesSelected() {
+    public static ArrayList<String> getValuesExcel() {
         ArrayList<String> rowString = new ArrayList<String>();
         try {
             for (int rows = 1; rows <= NUMERO_FILAS_BLOQUE_EXCEL; rows++) {
@@ -68,22 +68,22 @@ public class ReadExcel {
         return rowString;
     }
 
-    private static String getStackTrace(Throwable aThrowable) {
+    public static String getStackTrace(Throwable aThrowable) {
         Writer result = new StringWriter();
         PrintWriter printWriter = new PrintWriter(result);
         aThrowable.printStackTrace(printWriter);
         return result.toString();
     }
 
-    private static int getSheetRows(HSSFSheet hssfSheet) {
+    public int getSheetRows(HSSFSheet hssfSheet) {
         return hssfSheet.getLastRowNum() + 1;
     }
 
-    private static int getSheetCells(Row firstRow) {
+    public static int getSheetCells(Row firstRow) {
         return firstRow.getLastCellNum();
     }
 
-    private static ArrayList<String> getCellsNames(Row firstRow) {
+    public static ArrayList<String> getCellsNames(Row firstRow) {
         ArrayList<String> cellNamesList = new ArrayList<String>();
         for (int z = 0; z < firstRow.getLastCellNum(); z++) {
             Cell cellName = firstRow.getCell(z);
@@ -92,11 +92,11 @@ public class ReadExcel {
         return cellNamesList;
     }
 
-    private static String getSheetName(HSSFSheet hssfSheet) {
+    public String getSheetName(HSSFSheet hssfSheet) {
         return hssfSheet.getSheetName();
     }
 
-    private static void validateProperty(){
+    public void validateProperty(){
         if (ReadExcel.NUMERO_FILAS_BLOQUE_EXCEL == 0){
             SION.log(Modulo.VENTA, "NUMERO_FILAS_BLOQUE_EXCEL = " +
                     ReadExcel.NUMERO_FILAS_BLOQUE_EXCEL +
@@ -104,14 +104,45 @@ public class ReadExcel {
         }
     }
 
-    private static void getInfoSheet(){
+    public void getInfoSheet(){
         SION.log(Modulo.VENTA, getSheetName(hssfSheet) + " { totalRows: " +
                 getSheetRows(hssfSheet) + ", totalCells: " + getSheetCells(firstRow) +
                 ", NUMERO_FILAS_BLOQUE_EXCEL = " + NUMERO_FILAS_BLOQUE_EXCEL + " }", Level.INFO);
     }
 
+    public static ArrayList<ArrayList<String>> getSubLists(ArrayList<String> arrayExcel) {
+        ArrayList<ArrayList<String>> subLists = new ArrayList<ArrayList<String>>();
+        for (int i = 0; i < arrayExcel.size(); i += getSheetCells(firstRow)) {
+            int endIndex = Math.min(i + getSheetCells(firstRow), arrayExcel.size());
+            ArrayList<String> newSubList = new ArrayList<String>(arrayExcel.subList(i, endIndex));
+            subLists.add(newSubList);
+            System.out.println(newSubList);
+        }
+        return subLists;
+    }
+
+    public void getElementFromSublist(ArrayList<ArrayList<String>> sublist, int indexSubList, int indexElement) {
+        if (indexSubList > sublist.size()) {
+            SION.log(Modulo.VENTA, "Fuera del rango de subList.", Level.INFO);
+            if (indexElement > getSheetCells(firstRow)) {
+                SION.log(Modulo.VENTA, "Fuera del rango de elementos.", Level.INFO);
+            }
+        } else {
+            SION.log(Modulo.VENTA, String.valueOf(sublist.get(indexSubList).get(indexElement)), Level.INFO);
+        }
+    }
+
+    public void printSublist(ArrayList<String> subList) {
+        for (String element : subList) {
+            System.out.println(element);
+        }
+        System.out.println("\n Second subList \n");
+    }
+
     public static void main(String[] args) {
-        ReadExcel.FileXLS("C:\\Users\\10043042\\Documents\\IntelliJProjects\\ReadExcel\\davidOriginal.xls");
-        System.out.println(ReadExcel.getValuesSelected());
+        ReadExcel readExcel = new ReadExcel ("C:\\Users\\10043042\\Documents\\IntelliJProjects\\ReadExcel\\davidOriginal.xls");
+        //readExcel.getElementFromSublist(getSubLists(getValuesExcel()), 1, 5);
+        //System.out.println(getSubLists(getValuesExcel()));
+        System.out.println(getValuesExcel());
     }
 }
