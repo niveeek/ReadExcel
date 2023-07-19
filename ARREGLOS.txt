@@ -1,5 +1,14 @@
 SALDO INCIAL = {$ 3,595,186.82  , $ 3,632,506.82 , $ 3,705,286.82 }
 DESCRIPCIÓN DE OPERACIÓN = { 0054930052318S, 0896530052316, 0052730052314 }
 IMPORTE = { $ 37,320.00 , $ 72,780.00 , $ 68,280.00 }
-                     
 
+cuantas filas se enviaron correctamente?
+cuantas filas no se enviaron correctamente?
+cuantas filas se insertaron correctamente?
+cuantas filas no se insertaron correctamente?
+
+id proceso? llave de proceso? año mes dia, enviar id proceso, que corresponde al bloque
+
+Pensar en como se irá recorriendo cada bloque dependiendo de la propiedad
+
+NUMERO.FILAS.BLOQUE.EXCEL = 100
