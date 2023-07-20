@@ -110,13 +110,12 @@ public class ReadExcel {
                 ", NUMERO_FILAS_BLOQUE_EXCEL = " + NUMERO_FILAS_BLOQUE_EXCEL + " }", Level.INFO);
     }
 
-    public static ArrayList<ArrayList<String>> getSubLists(ArrayList<String> arrayExcel) {
+    public ArrayList<ArrayList<String>> getSubLists(ArrayList<String> arrayExcel) {
         ArrayList<ArrayList<String>> subLists = new ArrayList<ArrayList<String>>();
         for (int i = 0; i < arrayExcel.size(); i += getSheetCells(firstRow)) {
             int endIndex = Math.min(i + getSheetCells(firstRow), arrayExcel.size());
             ArrayList<String> newSubList = new ArrayList<String>(arrayExcel.subList(i, endIndex));
             subLists.add(newSubList);
-            System.out.println(newSubList);
         }
         return subLists;
     }
@@ -134,15 +133,13 @@ public class ReadExcel {
 
     public void printSublist(ArrayList<String> subList) {
         for (String element : subList) {
-            System.out.println(element);
+            SION.log(Modulo.VENTA, element, Level.INFO);
         }
-        System.out.println("\n Second subList \n");
+        SION.log(Modulo.VENTA, "\n Second subList \n", Level.INFO);
     }
 
     public static void main(String[] args) {
         ReadExcel readExcel = new ReadExcel ("C:\\Users\\10043042\\Documents\\IntelliJProjects\\ReadExcel\\davidOriginal.xls");
-        //readExcel.getElementFromSublist(getSubLists(getValuesExcel()), 1, 5);
-        //System.out.println(getSubLists(getValuesExcel()));
-        System.out.println(getValuesExcel());
+        System.out.println(readExcel.getSubLists(getValuesExcel()));
     }
 }
