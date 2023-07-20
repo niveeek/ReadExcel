@@ -11,5 +11,7 @@
     <orderEntry type="library" name="commons-codec-1.10" level="project" />
     <orderEntry type="library" name="curvesapi-1.04" level="project" />
     <orderEntry type="library" name="genericos-tienda-neto" level="project" />
+    <orderEntry type="library" name="ojdbc8" level="project" />
+    <orderEntry type="library" name="UtilServices" level="project" />
   </component>
 </module>

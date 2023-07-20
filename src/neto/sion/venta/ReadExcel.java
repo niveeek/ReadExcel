@@ -1,4 +1,4 @@
-package neto.sion.venta.tipos.archivos;
+package neto.sion.venta;
 
 import java.io.*;
 import java.util.ArrayList;
