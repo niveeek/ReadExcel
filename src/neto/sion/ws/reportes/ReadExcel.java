@@ -9,6 +9,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+//import neto.sion.venta.bean.operacionRequest;
 
 /**
  * @author 10043042
@@ -141,5 +142,8 @@ public class ReadExcel {
     public static void main(String[] args) {
         ReadExcel readExcel = new ReadExcel ("C:\\Users\\10043042\\Documents\\IntelliJProjects\\ReadExcel\\davidOriginal.xls");
         System.out.println(readExcel.getSubLists(getValuesExcel()));
+        //System.out.println(getValuesExcel());
+        //ArrayList<ArrayList<String>> subLists = readExcel.getSubLists(getValuesExcel());
+        //operacionRequest request = new operacionRequest(subLists);
     }
 }
