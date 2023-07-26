@@ -142,7 +142,7 @@ public class ReadExcel {
     public static void main(String[] args) {
         ReadExcel readExcel = new ReadExcel ("C:\\Users\\10043042\\Documents\\IntelliJProjects\\ReadExcel\\davidOriginal.xls");
         //readExcel.getElementFromSublist(getSubLists(getValuesExcel()), 1, 5);
-        //System.out.println(getSubLists(getValuesExcel()));
-        System.out.println(getValuesExcel());
+        System.out.println(getSubLists(getValuesExcel()));
+        //System.out.println(getValuesExcel());
     }
 }
