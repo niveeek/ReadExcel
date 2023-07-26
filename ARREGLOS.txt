@@ -9,6 +9,4 @@ cuantas filas no se insertaron correctamente?
 
 id proceso? llave de proceso? año mes dia, enviar id proceso, que corresponde al bloque
 
-Pensar en como se irá recorriendo cada bloque dependiendo de la propiedad
-
 NUMERO.FILAS.BLOQUE.EXCEL = 100
