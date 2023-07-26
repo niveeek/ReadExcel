@@ -14,10 +14,10 @@ import org.apache.poi.ss.usermodel.Row;
  * @author 10043042
  */
 public final class ReadExcel {
-    private static HSSFSheet hssfSheet;
+    private HSSFSheet hssfSheet;
     private static final int NUMERO_FILAS_BLOQUE_EXCEL = Integer.parseInt(
             SION.obtenerParametro(Modulo.VENTA,"NUMERO.FILAS.BLOQUE.EXCEL"));
-    private static Row firstRow;
+    private Row firstRow;
     private int newSubListSize;
 
     public ReadExcel(String pathExcel) {
@@ -76,15 +76,15 @@ public final class ReadExcel {
         return result.toString();
     }
 
-    public static int getSheetRows(HSSFSheet hssfSheet) {
+    public int getSheetRows(HSSFSheet hssfSheet) {
         return hssfSheet.getLastRowNum() + 1;
     }
 
-    public static int getSheetCells(Row firstRow) {
+    public int getSheetCells(Row firstRow) {
         return firstRow.getLastCellNum();
     }
 
-    public static ArrayList<String> getCellsNames(Row firstRow) {
+    public ArrayList<String> getCellsNames(Row firstRow) {
         ArrayList<String> cellNamesList = new ArrayList<String>();
         for (int z = 0; z < firstRow.getLastCellNum(); z++) {
             Cell cellName = firstRow.getCell(z);
