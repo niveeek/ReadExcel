@@ -18,6 +18,7 @@ public final class ReadExcel {
     private static final int NUMERO_FILAS_BLOQUE_EXCEL = Integer.parseInt(
             SION.obtenerParametro(Modulo.VENTA,"NUMERO.FILAS.BLOQUE.EXCEL"));
     private static Row firstRow;
+    private int newSubListSize;
 
     public ReadExcel(String pathExcel) {
         pathExcel = pathExcel.trim();
@@ -44,21 +45,19 @@ public final class ReadExcel {
     public ArrayList<String> getValuesExcel() {
         ArrayList<String> rowString = new ArrayList<String>();
         try {
-            for (int rows = 1; rows <= getSheetRows(hssfSheet); rows++) {
+            for (int rows = 1; rows <= 100; rows++) {
                 Row row = hssfSheet.getRow(rows);
-                if (row != null) {
-                    for (int cells = 0; cells < getSheetCells(firstRow); cells++) {
-                        Cell cell = row.getCell(cells);
-                        String cellType = cell.getCellTypeEnum().toString();
-                        if (getCellsNames(firstRow).get(cells) != null) {
-                            if ("STRING".equals(cellType)) {
-                                rowString.add(cell.getStringCellValue());
-                            } else {
-                                SION.log(Modulo.VENTA, "Tipo de dato no reconocido.", Level.INFO);
-                            }
+                for (int cells = 0; cells < getSheetCells(firstRow); cells++) {
+                    Cell cell = row.getCell(cells);
+                    String cellType = cell.getCellTypeEnum().toString();
+                    if (getCellsNames(firstRow).get(cells) != null) {
+                        if ("STRING".equals(cellType)) {
+                            rowString.add(cell.getStringCellValue());
                         } else {
-                            SION.log(Modulo.VENTA, "La columna " + cells + " no tiene nombre.", Level.SEVERE);
+                            SION.log(Modulo.VENTA, "Tipo de dato no reconocido.", Level.INFO);
                         }
+                    } else {
+                        SION.log(Modulo.VENTA, "La columna " + cells + " no tiene nombre.", Level.SEVERE);
                     }
                 }
             }
@@ -69,7 +68,6 @@ public final class ReadExcel {
         }
         return rowString;
     }
-
 
     public static String getStackTrace(Throwable aThrowable) {
         Writer result = new StringWriter();
@@ -115,35 +113,32 @@ public final class ReadExcel {
 
     public ArrayList<ArrayList<String>> getSubLists(ArrayList<String> arrayExcel) {
         ArrayList<ArrayList<String>> subLists = new ArrayList<ArrayList<String>>();
-        for (int i = 0; i < arrayExcel.size(); i ++) {
-            int endIndex = Math.min(i + 1, arrayExcel.size());
+        for (int i = 0; i < arrayExcel.size(); i += getSheetCells(firstRow)) {
+            int endIndex = Math.min(i + getSheetCells(firstRow), arrayExcel.size());
             ArrayList<String> newSubList = new ArrayList<String>(arrayExcel.subList(i, endIndex));
             subLists.add(newSubList);
+            newSubListSize = newSubList.size();
         }
         return subLists;
     }
 
 
     public void getElementFromSublist(ArrayList<ArrayList<String>> sublist, int indexSubList, int indexElement) {
-        if (indexSubList > sublist.size()) {
-            SION.log(Modulo.VENTA, "Fuera del rango de subList.", Level.INFO);
-            if (indexElement > getSheetCells(firstRow)) {
-                SION.log(Modulo.VENTA, "Fuera del rango de elementos.", Level.INFO);
-            }
+        indexSubList--;
+        indexElement--;
+        if (indexSubList >= sublist.size()) {
+            SION.log(Modulo.VENTA, "indexSubList = " + indexSubList + " Fuera del rango de subList.", Level.INFO);
+
+        } else if (indexElement >= newSubListSize) {
+            SION.log(Modulo.VENTA, "Fuera del rango de elementos.", Level.INFO);
         } else {
             SION.log(Modulo.VENTA, String.valueOf(sublist.get(indexSubList).get(indexElement)), Level.INFO);
         }
     }
 
-    public void printSublist(ArrayList<String> subList) {
-        for (String element : subList) {
-            SION.log(Modulo.VENTA, element, Level.INFO);
-        }
-        SION.log(Modulo.VENTA, "\n Second subList \n", Level.INFO);
-    }
-
     public static void main(String[] args) {
         ReadExcel readExcel = new ReadExcel ("C:\\Users\\10043042\\Documents\\IntelliJProjects\\ReadExcel\\davidOriginal.xls");
-        System.out.println(readExcel.getValuesExcel());
+        //readExcel.getElementFromSublist(readExcel.getSubLists(readExcel.getValuesExcel()), 2, 15);
+        System.out.println(readExcel.getSubLists(readExcel.getValuesExcel()));
     }
 }
