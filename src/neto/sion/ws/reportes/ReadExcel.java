@@ -108,7 +108,8 @@ public final class ReadExcel {
     public void getInfoSheet(){
         SION.log(Modulo.VENTA, getSheetName(hssfSheet) + " { totalRows: " +
                 getSheetRows(hssfSheet) + ", totalCells: " + getSheetCells(firstRow) +
-                ", NUMERO_FILAS_BLOQUE_EXCEL = " + NUMERO_FILAS_BLOQUE_EXCEL + " }", Level.INFO);
+                ", NUMERO_FILAS_BLOQUE_EXCEL = " + NUMERO_FILAS_BLOQUE_EXCEL +
+                ", ENCABEZADOS: " + getCellsNames(firstRow) + " }", Level.INFO);
     }
 
     public ArrayList<ArrayList<String>> getSubLists(ArrayList<String> arrayExcel) {
@@ -159,6 +160,6 @@ public final class ReadExcel {
     public static void main(String[] args) {
         ReadExcel readExcel = new ReadExcel ("C:\\Users\\10043042\\Documents\\IntelliJProjects\\ReadExcel\\davidOriginal.xls");
         //System.out.println(readExcel.blockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
-        readExcel.printBlocks();
+        //readExcel.printBlocks();
     }
 }
