@@ -1,4 +1,4 @@
-package neto.sion.venta;
+package neto.sion.ws.reportes;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -9,12 +9,11 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-//import neto.sion.venta.bean.operacionRequest;
 
 /**
  * @author 10043042
  */
-public class ReadExcel {
+public final class ReadExcel {
     private static HSSFSheet hssfSheet;
     private static final int NUMERO_FILAS_BLOQUE_EXCEL = Integer.parseInt(
             SION.obtenerParametro(Modulo.VENTA,"NUMERO.FILAS.BLOQUE.EXCEL"));
@@ -42,22 +41,24 @@ public class ReadExcel {
         }
     }
 
-    public static ArrayList<String> getValuesExcel() {
+    public ArrayList<String> getValuesExcel() {
         ArrayList<String> rowString = new ArrayList<String>();
         try {
-            for (int rows = 1; rows <= NUMERO_FILAS_BLOQUE_EXCEL; rows++) {
+            for (int rows = 1; rows <= getSheetRows(hssfSheet); rows++) {
                 Row row = hssfSheet.getRow(rows);
-                for (int cells = 0; cells < getSheetCells(firstRow); cells++) {
-                    Cell cell = row.getCell(cells);
-                    String cellType = cell.getCellTypeEnum().toString();
-                    if (getCellsNames(firstRow).get(cells) != null) {
-                        if ("STRING".equals(cellType)) {
-                            rowString.add(cell.getStringCellValue());
+                if (row != null) {
+                    for (int cells = 0; cells < getSheetCells(firstRow); cells++) {
+                        Cell cell = row.getCell(cells);
+                        String cellType = cell.getCellTypeEnum().toString();
+                        if (getCellsNames(firstRow).get(cells) != null) {
+                            if ("STRING".equals(cellType)) {
+                                rowString.add(cell.getStringCellValue());
+                            } else {
+                                SION.log(Modulo.VENTA, "Tipo de dato no reconocido.", Level.INFO);
+                            }
                         } else {
-                            SION.log(Modulo.VENTA, "Tipo de dato no reconocido.", Level.INFO);
+                            SION.log(Modulo.VENTA, "La columna " + cells + " no tiene nombre.", Level.SEVERE);
                         }
-                    } else {
-                        SION.log(Modulo.VENTA, "La columna " + cells + " no tiene nombre.", Level.SEVERE);
                     }
                 }
             }
@@ -69,6 +70,7 @@ public class ReadExcel {
         return rowString;
     }
 
+
     public static String getStackTrace(Throwable aThrowable) {
         Writer result = new StringWriter();
         PrintWriter printWriter = new PrintWriter(result);
@@ -76,7 +78,7 @@ public class ReadExcel {
         return result.toString();
     }
 
-    public int getSheetRows(HSSFSheet hssfSheet) {
+    public static int getSheetRows(HSSFSheet hssfSheet) {
         return hssfSheet.getLastRowNum() + 1;
     }
 
@@ -113,13 +115,14 @@ public class ReadExcel {
 
     public ArrayList<ArrayList<String>> getSubLists(ArrayList<String> arrayExcel) {
         ArrayList<ArrayList<String>> subLists = new ArrayList<ArrayList<String>>();
-        for (int i = 0; i < arrayExcel.size(); i += getSheetCells(firstRow)) {
-            int endIndex = Math.min(i + getSheetCells(firstRow), arrayExcel.size());
+        for (int i = 0; i < arrayExcel.size(); i ++) {
+            int endIndex = Math.min(i + 1, arrayExcel.size());
             ArrayList<String> newSubList = new ArrayList<String>(arrayExcel.subList(i, endIndex));
             subLists.add(newSubList);
         }
         return subLists;
     }
+
 
     public void getElementFromSublist(ArrayList<ArrayList<String>> sublist, int indexSubList, int indexElement) {
         if (indexSubList > sublist.size()) {
@@ -141,9 +144,6 @@ public class ReadExcel {
 
     public static void main(String[] args) {
         ReadExcel readExcel = new ReadExcel ("C:\\Users\\10043042\\Documents\\IntelliJProjects\\ReadExcel\\davidOriginal.xls");
-        System.out.println(readExcel.getSubLists(getValuesExcel()));
-        //System.out.println(getValuesExcel());
-        //ArrayList<ArrayList<String>> subLists = readExcel.getSubLists(getValuesExcel());
-        //operacionRequest request = new operacionRequest(subLists);
+        System.out.println(readExcel.getValuesExcel());
     }
 }

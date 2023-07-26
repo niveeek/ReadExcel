@@ -13,5 +13,14 @@
     <orderEntry type="library" name="genericos-tienda-neto" level="project" />
     <orderEntry type="library" name="ojdbc8" level="project" />
     <orderEntry type="library" name="UtilServices" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MAVEN_REPOSITORY$/org/jetbrains/annotations-java5/20.1.0/annotations-java5-20.1.0.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
