@@ -45,7 +45,7 @@ public final class ReadExcel {
     public ArrayList<String> getValuesExcel() {
         ArrayList<String> rowString = new ArrayList<String>();
         try {
-            for (int rows = 1; rows <= 100; rows++) {
+            for (int rows = 1; rows <= 12; rows++) {
                 Row row = hssfSheet.getRow(rows);
                 for (int cells = 0; cells < getSheetCells(firstRow); cells++) {
                     Cell cell = row.getCell(cells);
@@ -122,6 +122,15 @@ public final class ReadExcel {
         return subLists;
     }
 
+    public ArrayList<ArrayList<ArrayList<String>>> blockSubLists(ArrayList<ArrayList<String>> subLists) {
+        ArrayList<ArrayList<ArrayList<String>>> groupedLists = new ArrayList<ArrayList<ArrayList<String>>>();
+        for (int i = 0; i < subLists.size(); i += NUMERO_FILAS_BLOQUE_EXCEL) {
+            int endIndex = Math.min(i + NUMERO_FILAS_BLOQUE_EXCEL, subLists.size());
+            ArrayList<ArrayList<String>> newGroup = new ArrayList<ArrayList<String>>(subLists.subList(i, endIndex));
+            groupedLists.add(newGroup);
+        }
+        return groupedLists;
+    }
 
     public void getElementFromSublist(ArrayList<ArrayList<String>> sublist, int indexSubList, int indexElement) {
         indexSubList--;
@@ -136,9 +145,20 @@ public final class ReadExcel {
         }
     }
 
+    public void printBlocks() {
+        int counterBlock = 1;
+        for (ArrayList<ArrayList<String>> group : blockSubLists(getSubLists(getValuesExcel()))) {
+            SION.log(Modulo.VENTA, "Block #" + counterBlock, Level.INFO);
+            for (ArrayList<String> subList : group) {
+                SION.log(Modulo.VENTA, String.valueOf(subList), Level.INFO);
+            }
+            counterBlock++;
+        }
+    }
+
     public static void main(String[] args) {
         ReadExcel readExcel = new ReadExcel ("C:\\Users\\10043042\\Documents\\IntelliJProjects\\ReadExcel\\davidOriginal.xls");
-        //readExcel.getElementFromSublist(readExcel.getSubLists(readExcel.getValuesExcel()), 2, 15);
-        System.out.println(readExcel.getSubLists(readExcel.getValuesExcel()));
+        //System.out.println(readExcel.blockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
+        readExcel.printBlocks();
     }
 }
