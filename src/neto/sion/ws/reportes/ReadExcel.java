@@ -19,6 +19,7 @@ public final class ReadExcel {
             SION.obtenerParametro(Modulo.VENTA,"NUMERO.FILAS.BLOQUE.EXCEL"));
     private Row firstRow;
     private int newSubListSize;
+    private final ArrayList<ArrayList<ArrayList<String>>> groupedLists = new ArrayList<ArrayList<ArrayList<String>>>();
 
     public ReadExcel(String pathExcel) {
         pathExcel = pathExcel.trim();
@@ -123,8 +124,7 @@ public final class ReadExcel {
         return subLists;
     }
 
-    public ArrayList<ArrayList<ArrayList<String>>> blockSubLists(ArrayList<ArrayList<String>> subLists) {
-        ArrayList<ArrayList<ArrayList<String>>> groupedLists = new ArrayList<ArrayList<ArrayList<String>>>();
+    public ArrayList<ArrayList<ArrayList<String>>> getBlockSubLists(ArrayList<ArrayList<String>> subLists) {
         for (int i = 0; i < subLists.size(); i += NUMERO_FILAS_BLOQUE_EXCEL) {
             int endIndex = Math.min(i + NUMERO_FILAS_BLOQUE_EXCEL, subLists.size());
             ArrayList<ArrayList<String>> newGroup = new ArrayList<ArrayList<String>>(subLists.subList(i, endIndex));
@@ -133,22 +133,24 @@ public final class ReadExcel {
         return groupedLists;
     }
 
-    public void getElementFromSublist(ArrayList<ArrayList<String>> sublist, int indexSubList, int indexElement) {
+    public void getElementFromSublist(ArrayList<ArrayList<ArrayList<String>>> blockSubLists, int indexBlock, int indexSubList, int indexElement) {
         indexSubList--;
         indexElement--;
-        if (indexSubList >= sublist.size()) {
+        indexBlock--;
+        if (indexBlock >= groupedLists.size()) {
+            SION.log(Modulo.VENTA, "indexBlock = " + indexBlock + " Fuera del rango de bloques.", Level.INFO);
+        } else if (indexSubList >= blockSubLists.size()) {
             SION.log(Modulo.VENTA, "indexSubList = " + indexSubList + " Fuera del rango de subList.", Level.INFO);
-
         } else if (indexElement >= newSubListSize) {
-            SION.log(Modulo.VENTA, "Fuera del rango de elementos.", Level.INFO);
-        } else {
-            SION.log(Modulo.VENTA, String.valueOf(sublist.get(indexSubList).get(indexElement)), Level.INFO);
+            SION.log(Modulo.VENTA, "indexElement = " + indexElement + " Fuera del rango de elementos.", Level.INFO);
+        }  else {
+            SION.log(Modulo.VENTA, String.valueOf(blockSubLists.get(indexBlock).get(indexSubList).get(indexElement)), Level.INFO);
         }
     }
 
     public void printBlocks() {
         int counterBlock = 1;
-        for (ArrayList<ArrayList<String>> group : blockSubLists(getSubLists(getValuesExcel()))) {
+        for (ArrayList<ArrayList<String>> group : getBlockSubLists(getSubLists(getValuesExcel()))) {
             SION.log(Modulo.VENTA, "Block #" + counterBlock, Level.INFO);
             for (ArrayList<String> subList : group) {
                 SION.log(Modulo.VENTA, String.valueOf(subList), Level.INFO);
@@ -160,6 +162,7 @@ public final class ReadExcel {
     public static void main(String[] args) {
         ReadExcel readExcel = new ReadExcel ("C:\\Users\\10043042\\Documents\\IntelliJProjects\\ReadExcel\\davidOriginal.xls");
         //System.out.println(readExcel.blockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
-        //readExcel.printBlocks();
+        readExcel.printBlocks();
+        readExcel.getElementFromSublist(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())), 1, 4, 8);
     }
 }
