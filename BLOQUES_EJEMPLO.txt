@@ -1,3 +1,6 @@
+eliminar signo de pesos y comas
+hacer un resumen de datos enviados: cuales buenos, cuantos buenos, cuales malos, cuantos malos
+
 [ //ARREGLO PADRE
 
 	[ 	//BLOQUE 1

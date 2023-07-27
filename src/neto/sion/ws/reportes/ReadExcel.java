@@ -15,11 +15,9 @@ import org.apache.poi.ss.usermodel.Row;
  */
 public final class ReadExcel {
     private HSSFSheet hssfSheet;
+    private Row firstRow;
     private static final int NUMERO_FILAS_BLOQUE_EXCEL = Integer.parseInt(
             SION.obtenerParametro(Modulo.VENTA,"NUMERO.FILAS.BLOQUE.EXCEL"));
-    private Row firstRow;
-    private int newSubListSize;
-    private final ArrayList<ArrayList<ArrayList<String>>> groupedLists = new ArrayList<ArrayList<ArrayList<String>>>();
 
     public ReadExcel(String pathExcel) {
         pathExcel = pathExcel.trim();
@@ -70,7 +68,7 @@ public final class ReadExcel {
         return rowString;
     }
 
-    public static String getStackTrace(Throwable aThrowable) {
+    public String getStackTrace(Throwable aThrowable) {
         Writer result = new StringWriter();
         PrintWriter printWriter = new PrintWriter(result);
         aThrowable.printStackTrace(printWriter);
@@ -119,12 +117,12 @@ public final class ReadExcel {
             int endIndex = Math.min(i + getSheetCells(firstRow), arrayExcel.size());
             ArrayList<String> newSubList = new ArrayList<String>(arrayExcel.subList(i, endIndex));
             subLists.add(newSubList);
-            newSubListSize = newSubList.size();
         }
         return subLists;
     }
 
     public ArrayList<ArrayList<ArrayList<String>>> getBlockSubLists(ArrayList<ArrayList<String>> subLists) {
+        ArrayList<ArrayList<ArrayList<String>>> groupedLists = new ArrayList<ArrayList<ArrayList<String>>>();
         for (int i = 0; i < subLists.size(); i += NUMERO_FILAS_BLOQUE_EXCEL) {
             int endIndex = Math.min(i + NUMERO_FILAS_BLOQUE_EXCEL, subLists.size());
             ArrayList<ArrayList<String>> newGroup = new ArrayList<ArrayList<String>>(subLists.subList(i, endIndex));
@@ -133,36 +131,114 @@ public final class ReadExcel {
         return groupedLists;
     }
 
-    public void getElementFromSublist(ArrayList<ArrayList<ArrayList<String>>> blockSubLists, int indexBlock, int indexSubList, int indexElement) {
-        indexSubList--;
-        indexElement--;
-        indexBlock--;
-        if (indexBlock >= groupedLists.size()) {
-            SION.log(Modulo.VENTA, "indexBlock = " + indexBlock + " Fuera del rango de bloques.", Level.INFO);
-        } else if (indexSubList >= blockSubLists.size()) {
-            SION.log(Modulo.VENTA, "indexSubList = " + indexSubList + " Fuera del rango de subList.", Level.INFO);
-        } else if (indexElement >= newSubListSize) {
-            SION.log(Modulo.VENTA, "indexElement = " + indexElement + " Fuera del rango de elementos.", Level.INFO);
-        }  else {
-            SION.log(Modulo.VENTA, String.valueOf(blockSubLists.get(indexBlock).get(indexSubList).get(indexElement)), Level.INFO);
+    private int getElementsSize(ArrayList<String> subArray) {
+        return subArray.size();
+    }
+
+    private int getBlockSize(ArrayList<ArrayList<ArrayList<String>>> block) {
+        return block.size();
+    }
+
+    public String getElementFromSubArray(ArrayList<ArrayList<ArrayList<String>>> blockSubArray, int indexBlock, int indexSubArray, int indexElement) {
+        try {
+            int blockSize = getBlockSize(blockSubArray);
+            int elementsSubArray = getElementsSize(blockSubArray.get(indexBlock).get(indexSubArray));
+            SION.log(Modulo.VENTA, "DimensionsExcel{ totalBlocks = " + blockSize + ", totalSubArrays = " + NUMERO_FILAS_BLOQUE_EXCEL + ", totalElementsSubArray = " + elementsSubArray + "}", Level.INFO);
+            SION.log(Modulo.VENTA, "getElementFromSublist{ indexBlock = " + indexBlock + ", indexSubArray = " + indexSubArray + ", indexElement = " + indexElement + "}", Level.INFO);
+            if (indexBlock >= blockSize) {
+                SION.log(Modulo.VENTA, "indexBlock = " + indexBlock + " Fuera del rango de bloques.", Level.INFO);
+                return null;
+            } else if (indexSubArray >= NUMERO_FILAS_BLOQUE_EXCEL) {
+                SION.log(Modulo.VENTA, "indexSubArray = " + indexSubArray + " Fuera del rango de subList.", Level.INFO);
+                return null;
+            } else if (indexElement >= elementsSubArray) {
+                SION.log(Modulo.VENTA, "indexElement = " + indexElement + " Fuera del rango de elementos.", Level.INFO);
+                return null;
+            } else {
+                return blockSubArray.get(indexBlock).get(indexSubArray).get(indexElement);
+            }
+        } catch (IndexOutOfBoundsException e) {
+            SION.logearExcepcion(Modulo.VENTA, e, "Fuera del rango.");
+            return null;
+        } catch (NumberFormatException e) {
+            SION.logearExcepcion(Modulo.VENTA, e, "Número no válido.");
+            return null;
+        } catch (Exception e) {
+            SION.logearExcepcion(Modulo.VENTA, e, getStackTrace(e));
+            return null;
         }
     }
 
-    public void printBlocks() {
-        int counterBlock = 1;
-        for (ArrayList<ArrayList<String>> group : getBlockSubLists(getSubLists(getValuesExcel()))) {
-            SION.log(Modulo.VENTA, "Block #" + counterBlock, Level.INFO);
+    public void printBlocks(ArrayList<ArrayList<ArrayList<String>>> excelData) {
+        int counterBlock = 0;
+        int counterSubArray = 0;
+        for (ArrayList<ArrayList<String>> group : excelData) {
             for (ArrayList<String> subList : group) {
+                SION.log(Modulo.VENTA, "Block #" + counterBlock + ", SubArray #" + counterSubArray, Level.INFO);
                 SION.log(Modulo.VENTA, String.valueOf(subList), Level.INFO);
+                counterSubArray++;
             }
+            counterSubArray = 0;
             counterBlock++;
         }
     }
 
+    public ArrayList<ArrayList<String>> getDataFailed(ArrayList<ArrayList<ArrayList<String>>> excelData) {
+        ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
+        for (int indexBlock = 0; indexBlock < excelData.size(); indexBlock++) {
+            ArrayList<ArrayList<String>> block = excelData.get(indexBlock);
+            for (int indexSubList = 0; indexSubList < block.size(); indexSubList++) {
+                ArrayList<String> subList = block.get(indexSubList);
+                for (int indexElement = 0; indexElement < subList.size(); indexElement++) {
+                    String element = subList.get(indexElement);
+                    if (element == null || element.isEmpty()) {
+                        ArrayList<String> indexesList = new ArrayList<String>();
+                        indexesList.add(String.valueOf(indexBlock));
+                        indexesList.add(String.valueOf(indexSubList));
+                        indexesList.add(String.valueOf(indexElement));
+                        result.add(indexesList);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public int getTotalDataFailed() {
+        return getDataFailed(getBlockSubLists(getSubLists(getValuesExcel()))).size();
+    }
+
+    public ArrayList<ArrayList<String>> getDataPassed(ArrayList<ArrayList<ArrayList<String>>> excelData) {
+        ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
+        for (int indexBlock = 0; indexBlock < excelData.size(); indexBlock++) {
+            ArrayList<ArrayList<String>> block = excelData.get(indexBlock);
+            for (int indexSubList = 0; indexSubList < block.size(); indexSubList++) {
+                ArrayList<String> subList = block.get(indexSubList);
+                for (int indexElement = 0; indexElement < subList.size(); indexElement++) {
+                    String element = subList.get(indexElement);
+                    if (element != null) {
+                        ArrayList<String> indexesList = new ArrayList<String>();
+                        indexesList.add(String.valueOf(indexBlock));
+                        indexesList.add(String.valueOf(indexSubList));
+                        indexesList.add(String.valueOf(indexElement));
+                        result.add(indexesList);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public int getTotalDataPassed() {
+        return getDataPassed(getBlockSubLists(getSubLists(getValuesExcel()))).size();
+    }
+
     public static void main(String[] args) {
         ReadExcel readExcel = new ReadExcel ("C:\\Users\\10043042\\Documents\\IntelliJProjects\\ReadExcel\\davidOriginal.xls");
-        //System.out.println(readExcel.blockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
-        readExcel.printBlocks();
-        readExcel.getElementFromSublist(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())), 1, 4, 8);
+        readExcel.printBlocks(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
+        System.out.println(readExcel.getDataFailed(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel()))));
+        System.out.println(readExcel.getTotalDataFailed());
+        //System.out.println(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
+        //System.out.println(readExcel.getElementFromSubArray(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())), 3, 1, 9));
     }
 }
