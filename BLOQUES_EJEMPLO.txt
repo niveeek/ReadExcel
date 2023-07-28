@@ -1,5 +1,3 @@
-hacer merge con main
-
 [ //ARREGLO PADRE
 
 	[ 	//BLOQUE 1
