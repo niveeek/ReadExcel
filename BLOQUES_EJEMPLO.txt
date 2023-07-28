@@ -1,4 +1,3 @@
-eliminar signo de pesos y comas
 hacer merge con main
 
 [ //ARREGLO PADRE

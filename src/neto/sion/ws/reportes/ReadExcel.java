@@ -118,7 +118,11 @@ public final class ReadExcel {
             ArrayList<String> newSubList = new ArrayList<String>(arrayExcel.subList(i, endIndex));
             for (int j = 0; j < newSubList.size(); j++) {
                 String element = newSubList.get(j);
-                newSubList.set(j, element.trim());
+                element = element.trim();
+                element = element.replace("$", "");
+                element = element.replace(",", "");
+                element = element.replace("-", "");
+                newSubList.set(j, element);
             }
             subLists.add(newSubList);
         }
@@ -238,17 +242,17 @@ public final class ReadExcel {
     }
 
     public void getInfoDataFilter(ArrayList<ArrayList<ArrayList<String>>> excelData) {
-        SION.log(Modulo.VENTA, "DataFailed [indexBlock, indexSubArray, indexElement]: " + String.valueOf(getDataFailed(excelData)), Level.INFO);
-        SION.log(Modulo.VENTA, "TotalDataFailed: " + String.valueOf(getTotalDataFailed()), Level.INFO);
-        SION.log(Modulo.VENTA, "DataPassed [indexBlock, indexSubArray, indexElement]: " + String.valueOf(getDataPassed(excelData)), Level.INFO);
-        SION.log(Modulo.VENTA, "TotalDataPassed: " + String.valueOf(getTotalDataPassed()), Level.INFO);
+        SION.log(Modulo.VENTA, "DataFailed [indexBlock, indexSubArray, indexElement]: " + getDataFailed(excelData), Level.INFO);
+        SION.log(Modulo.VENTA, "TotalDataFailed: " + getTotalDataFailed(), Level.INFO);
+        SION.log(Modulo.VENTA, "DataPassed [indexBlock, indexSubArray, indexElement]: " + getDataPassed(excelData), Level.INFO);
+        SION.log(Modulo.VENTA, "TotalDataPassed: " + getTotalDataPassed(), Level.INFO);
     }
 
     public static void main(String[] args) {
         ReadExcel readExcel = new ReadExcel ("C:\\Users\\10043042\\Documents\\IntelliJProjects\\ReadExcel\\davidOriginal.xls");
-        //readExcel.printBlocks(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
-        System.out.println(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
+        readExcel.printBlocks(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
+        //System.out.println(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
         //System.out.println(readExcel.getElementFromSubArray(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())), 1, 1, 13));
-        readExcel.getInfoDataFilter(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
+        //readExcel.getInfoDataFilter(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
     }
 }
