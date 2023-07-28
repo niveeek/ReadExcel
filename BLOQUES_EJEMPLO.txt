@@ -1,5 +1,5 @@
 eliminar signo de pesos y comas
-hacer un resumen de datos enviados: cuales buenos, cuantos buenos, cuales malos, cuantos malos
+hacer merge con main
 
 [ //ARREGLO PADRE
 

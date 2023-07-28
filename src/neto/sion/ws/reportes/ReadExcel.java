@@ -44,7 +44,7 @@ public final class ReadExcel {
     public ArrayList<String> getValuesExcel() {
         ArrayList<String> rowString = new ArrayList<String>();
         try {
-            for (int rows = 1; rows <= 12; rows++) {
+            for (int rows = 1; rows <= 5; rows++) {
                 Row row = hssfSheet.getRow(rows);
                 for (int cells = 0; cells < getSheetCells(firstRow); cells++) {
                     Cell cell = row.getCell(cells);
@@ -116,6 +116,10 @@ public final class ReadExcel {
         for (int i = 0; i < arrayExcel.size(); i += getSheetCells(firstRow)) {
             int endIndex = Math.min(i + getSheetCells(firstRow), arrayExcel.size());
             ArrayList<String> newSubList = new ArrayList<String>(arrayExcel.subList(i, endIndex));
+            for (int j = 0; j < newSubList.size(); j++) {
+                String element = newSubList.get(j);
+                newSubList.set(j, element.trim());
+            }
             subLists.add(newSubList);
         }
         return subLists;
@@ -187,14 +191,14 @@ public final class ReadExcel {
         ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
         for (int indexBlock = 0; indexBlock < excelData.size(); indexBlock++) {
             ArrayList<ArrayList<String>> block = excelData.get(indexBlock);
-            for (int indexSubList = 0; indexSubList < block.size(); indexSubList++) {
-                ArrayList<String> subList = block.get(indexSubList);
+            for (int indexSubArray = 0; indexSubArray < block.size(); indexSubArray++) {
+                ArrayList<String> subList = block.get(indexSubArray);
                 for (int indexElement = 0; indexElement < subList.size(); indexElement++) {
                     String element = subList.get(indexElement);
-                    if (element == null || element.isEmpty()) {
+                    if (element.trim().isEmpty()) {
                         ArrayList<String> indexesList = new ArrayList<String>();
                         indexesList.add(String.valueOf(indexBlock));
-                        indexesList.add(String.valueOf(indexSubList));
+                        indexesList.add(String.valueOf(indexSubArray));
                         indexesList.add(String.valueOf(indexElement));
                         result.add(indexesList);
                     }
@@ -212,14 +216,14 @@ public final class ReadExcel {
         ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
         for (int indexBlock = 0; indexBlock < excelData.size(); indexBlock++) {
             ArrayList<ArrayList<String>> block = excelData.get(indexBlock);
-            for (int indexSubList = 0; indexSubList < block.size(); indexSubList++) {
-                ArrayList<String> subList = block.get(indexSubList);
+            for (int indexSubArray = 0; indexSubArray < block.size(); indexSubArray++) {
+                ArrayList<String> subList = block.get(indexSubArray);
                 for (int indexElement = 0; indexElement < subList.size(); indexElement++) {
                     String element = subList.get(indexElement);
-                    if (element != null) {
+                    if (element != null && !element.trim().isEmpty()) {
                         ArrayList<String> indexesList = new ArrayList<String>();
                         indexesList.add(String.valueOf(indexBlock));
-                        indexesList.add(String.valueOf(indexSubList));
+                        indexesList.add(String.valueOf(indexSubArray));
                         indexesList.add(String.valueOf(indexElement));
                         result.add(indexesList);
                     }
@@ -233,12 +237,18 @@ public final class ReadExcel {
         return getDataPassed(getBlockSubLists(getSubLists(getValuesExcel()))).size();
     }
 
+    public void getInfoDataFilter(ArrayList<ArrayList<ArrayList<String>>> excelData) {
+        SION.log(Modulo.VENTA, "DataFailed [indexBlock, indexSubArray, indexElement]: " + String.valueOf(getDataFailed(excelData)), Level.INFO);
+        SION.log(Modulo.VENTA, "TotalDataFailed: " + String.valueOf(getTotalDataFailed()), Level.INFO);
+        SION.log(Modulo.VENTA, "DataPassed [indexBlock, indexSubArray, indexElement]: " + String.valueOf(getDataPassed(excelData)), Level.INFO);
+        SION.log(Modulo.VENTA, "TotalDataPassed: " + String.valueOf(getTotalDataPassed()), Level.INFO);
+    }
+
     public static void main(String[] args) {
         ReadExcel readExcel = new ReadExcel ("C:\\Users\\10043042\\Documents\\IntelliJProjects\\ReadExcel\\davidOriginal.xls");
-        readExcel.printBlocks(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
-        System.out.println(readExcel.getDataFailed(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel()))));
-        System.out.println(readExcel.getTotalDataFailed());
-        //System.out.println(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
-        //System.out.println(readExcel.getElementFromSubArray(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())), 3, 1, 9));
+        //readExcel.printBlocks(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
+        System.out.println(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
+        //System.out.println(readExcel.getElementFromSubArray(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())), 1, 1, 13));
+        readExcel.getInfoDataFilter(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
     }
 }
