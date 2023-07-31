@@ -3,6 +3,7 @@ package neto.sion.ws.reportes;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.logging.Level;
+
 import neto.sion.tienda.genericos.configuraciones.SION;
 import neto.sion.tienda.genericos.utilidades.Modulo;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -17,7 +18,7 @@ public final class ReadExcel {
     private HSSFSheet hssfSheet;
     private Row firstRow;
     private static final int NUMERO_FILAS_BLOQUE_EXCEL = Integer.parseInt(
-            SION.obtenerParametro(Modulo.VENTA,"NUMERO.FILAS.BLOQUE.EXCEL"));
+            SION.obtenerParametro(Modulo.VENTA, "NUMERO.FILAS.BLOQUE.EXCEL"));
 
     public ReadExcel(String pathExcel) {
         pathExcel = pathExcel.trim();
@@ -41,31 +42,61 @@ public final class ReadExcel {
         }
     }
 
-    public ArrayList<String> getValuesExcel() {
+    public ArrayList<ArrayList<ArrayList<String>>> getValuesExcel() {
         ArrayList<String> rowString = new ArrayList<String>();
+        ArrayList<ArrayList<String>> subLists = new ArrayList<ArrayList<String>>();
+        ArrayList<ArrayList<ArrayList<String>>> groupedLists = new ArrayList<ArrayList<ArrayList<String>>>();
         try {
-            for (int rows = 1; rows <= 5; rows++) {
-                Row row = hssfSheet.getRow(rows);
-                for (int cells = 0; cells < getSheetCells(firstRow); cells++) {
-                    Cell cell = row.getCell(cells);
-                    String cellType = cell.getCellTypeEnum().toString();
-                    if (getCellsNames(firstRow).get(cells) != null) {
-                        if ("STRING".equals(cellType)) {
-                            rowString.add(cell.getStringCellValue());
-                        } else {
-                            SION.log(Modulo.VENTA, "Tipo de dato no reconocido.", Level.INFO);
+            for (int rowBlockStart = 1; rowBlockStart <= 4; rowBlockStart += NUMERO_FILAS_BLOQUE_EXCEL) {
+                int rowBlockEnd = Math.min(rowBlockStart + NUMERO_FILAS_BLOQUE_EXCEL - 1, 4);
+                for (int rowBlock = rowBlockStart; rowBlock <= rowBlockEnd; rowBlock++) {
+                    Row row = hssfSheet.getRow(rowBlock);
+                    if (row != null) {
+                        for (int cells = 0; cells < getSheetCells(firstRow); cells++) {
+                            Cell cell = row.getCell(cells);
+                            String cellType = cell.getCellTypeEnum().toString();
+                            if (getCellsNames(firstRow).get(cells) != null) {
+                                if ("STRING".equals(cellType)) {
+                                    rowString.add(cell.getStringCellValue());
+                                } else {
+                                    SION.log(Modulo.VENTA, "Tipo de dato no reconocido.", Level.INFO);
+                                }
+                            } else {
+                                SION.log(Modulo.VENTA, "La columna " + cells + " no tiene nombre.", Level.SEVERE);
+                            }
                         }
-                    } else {
-                        SION.log(Modulo.VENTA, "La columna " + cells + " no tiene nombre.", Level.SEVERE);
                     }
                 }
+
+                // Print the message for each block of three rows read
+                int blockNumber = (rowBlockStart - 1) / NUMERO_FILAS_BLOQUE_EXCEL + 1;
+                System.out.println("Bloque " + blockNumber + " leído");
+                System.out.println(String.valueOf(rowString.size()/14)+rowString);
+            }
+            for (int i = 0; i < rowString.size(); i += getSheetCells(firstRow)) {
+                int endIndex = Math.min(i + getSheetCells(firstRow), rowString.size());
+                ArrayList<String> newSubList = new ArrayList<String>(rowString.subList(i, endIndex));
+                for (int j = 0; j < newSubList.size(); j++) {
+                    String element = newSubList.get(j);
+                    element = element.trim();
+                    element = element.replace("$", "");
+                    element = element.replace(",", "");
+                    element = element.replace("-", "");
+                    newSubList.set(j, element);
+                }
+                subLists.add(newSubList);
+            }
+            for (int i = 0; i < subLists.size(); i += NUMERO_FILAS_BLOQUE_EXCEL) {
+                int endIndex = Math.min(i + NUMERO_FILAS_BLOQUE_EXCEL, subLists.size());
+                ArrayList<ArrayList<String>> newGroup = new ArrayList<ArrayList<String>>(subLists.subList(i, endIndex));
+                groupedLists.add(newGroup);
             }
         } catch (NumberFormatException numberFormatException) {
             SION.logearExcepcion(Modulo.VENTA, numberFormatException, "Número no válido.");
         } catch (Exception exception) {
             SION.logearExcepcion(Modulo.VENTA, exception, getStackTrace(exception));
         }
-        return rowString;
+        return groupedLists;
     }
 
     public String getStackTrace(Throwable aThrowable) {
@@ -96,15 +127,15 @@ public final class ReadExcel {
         return hssfSheet.getSheetName();
     }
 
-    public void validateProperty(){
-        if (ReadExcel.NUMERO_FILAS_BLOQUE_EXCEL == 0){
+    public void validateProperty() {
+        if (ReadExcel.NUMERO_FILAS_BLOQUE_EXCEL == 0) {
             SION.log(Modulo.VENTA, "NUMERO_FILAS_BLOQUE_EXCEL = " +
                     ReadExcel.NUMERO_FILAS_BLOQUE_EXCEL +
-                    ", entonces el arreglo se imprime vacío.",Level.INFO);
+                    ", entonces el arreglo se imprime vacío.", Level.INFO);
         }
     }
 
-    public void getInfoSheet(){
+    public void getInfoSheet() {
         SION.log(Modulo.VENTA, getSheetName(hssfSheet) + " { totalRows: " +
                 getSheetRows(hssfSheet) + ", totalCells: " + getSheetCells(firstRow) +
                 ", NUMERO_FILAS_BLOQUE_EXCEL = " + NUMERO_FILAS_BLOQUE_EXCEL +
@@ -191,6 +222,7 @@ public final class ReadExcel {
         }
     }
 
+
     public ArrayList<ArrayList<String>> getDataFailed(ArrayList<ArrayList<ArrayList<String>>> excelData) {
         ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
         for (int indexBlock = 0; indexBlock < excelData.size(); indexBlock++) {
@@ -212,9 +244,9 @@ public final class ReadExcel {
         return result;
     }
 
-    public int getTotalDataFailed() {
+    /*public int getTotalDataFailed() {
         return getDataFailed(getBlockSubLists(getSubLists(getValuesExcel()))).size();
-    }
+    }*/
 
     public ArrayList<ArrayList<String>> getDataPassed(ArrayList<ArrayList<ArrayList<String>>> excelData) {
         ArrayList<ArrayList<String>> result = new ArrayList<ArrayList<String>>();
@@ -237,7 +269,7 @@ public final class ReadExcel {
         return result;
     }
 
-    public int getTotalDataPassed() {
+    /*public int getTotalDataPassed() {
         return getDataPassed(getBlockSubLists(getSubLists(getValuesExcel()))).size();
     }
 
@@ -246,14 +278,10 @@ public final class ReadExcel {
         SION.log(Modulo.VENTA, "TotalDataFailed: " + getTotalDataFailed(), Level.INFO);
         SION.log(Modulo.VENTA, "DataPassed [indexBlock, indexSubArray, indexElement]: " + getDataPassed(excelData), Level.INFO);
         SION.log(Modulo.VENTA, "TotalDataPassed: " + getTotalDataPassed(), Level.INFO);
-    }
+    }*/
 
     public static void main(String[] args) {
-        ReadExcel readExcel = new ReadExcel ("C:\\Users\\10043042\\Documents\\IntelliJProjects\\ReadExcel\\davidOriginal.xls");
-
-        //readExcel.printBlocks(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
-        //System.out.println(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
-        //System.out.println(readExcel.getElementFromSubArray(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())), 1, 1, 13));
-        readExcel.getInfoDataFilter(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
+        ReadExcel readExcel = new ReadExcel("C:\\Users\\10043042\\Documents\\IntelliJProjects\\ReadExcel\\davidOriginal.xls");
+        readExcel.printBlocks(readExcel.getValuesExcel());
     }
 }
