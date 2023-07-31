@@ -17,7 +17,7 @@ import org.apache.poi.ss.usermodel.Row;
 public final class ReadExcel {
     private HSSFSheet hssfSheet;
     private Row firstRow;
-    private static final int NUMERO_FILAS_BLOQUE_EXCEL = Integer.parseInt(
+    public static final int NUMERO_FILAS_BLOQUE_EXCEL = Integer.parseInt(
             SION.obtenerParametro(Modulo.VENTA, "NUMERO.FILAS.BLOQUE.EXCEL"));
 
     public ReadExcel(String pathExcel) {
