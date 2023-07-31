@@ -16,7 +16,7 @@ import org.apache.poi.ss.usermodel.Row;
 public final class ReadExcel {
     private HSSFSheet hssfSheet;
     private Row firstRow;
-    private static final int NUMERO_FILAS_BLOQUE_EXCEL = Integer.parseInt(
+    public static final int NUMERO_FILAS_BLOQUE_EXCEL = Integer.parseInt(
             SION.obtenerParametro(Modulo.VENTA,"NUMERO.FILAS.BLOQUE.EXCEL"));
 
     public ReadExcel(String pathExcel) {
@@ -246,6 +246,14 @@ public final class ReadExcel {
         SION.log(Modulo.VENTA, "TotalDataFailed: " + getTotalDataFailed(), Level.INFO);
         SION.log(Modulo.VENTA, "DataPassed [indexBlock, indexSubArray, indexElement]: " + getDataPassed(excelData), Level.INFO);
         SION.log(Modulo.VENTA, "TotalDataPassed: " + getTotalDataPassed(), Level.INFO);
+    }
+
+    public HSSFSheet getHssfSheet() {
+        return hssfSheet;
+    }
+
+    public Row getFirstRow() {
+        return firstRow;
     }
 
     public static void main(String[] args) {
