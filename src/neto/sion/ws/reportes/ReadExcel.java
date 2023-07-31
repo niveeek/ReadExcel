@@ -250,9 +250,10 @@ public final class ReadExcel {
 
     public static void main(String[] args) {
         ReadExcel readExcel = new ReadExcel ("C:\\Users\\10043042\\Documents\\IntelliJProjects\\ReadExcel\\davidOriginal.xls");
-        readExcel.printBlocks(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
+
+        //readExcel.printBlocks(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
         //System.out.println(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
         //System.out.println(readExcel.getElementFromSubArray(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())), 1, 1, 13));
-        //readExcel.getInfoDataFilter(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
+        readExcel.getInfoDataFilter(readExcel.getBlockSubLists(readExcel.getSubLists(readExcel.getValuesExcel())));
     }
 }
